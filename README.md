@@ -19,7 +19,7 @@
 ### Bước 1: Clone project
 
 ```bash
-git clone https://github.com/PlayMaker1508/student-management-system
+git clone https://github.com/nghiaphancs/student-management-system
 cd student-management-system
 ```
 
@@ -204,4 +204,5 @@ Sử dụng Thymeleaf:
 ### Chức Năng Thêm & Sửa
 
 ![Add & Edit](screenshots/add-edit.png)
+
 
