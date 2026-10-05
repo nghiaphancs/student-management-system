@@ -1,208 +1,131 @@
 # Student Management System
 
-## 👥 Danh sách nhóm
+A student management application built with Spring Boot, Thymeleaf, and PostgreSQL. The project provides a web interface for viewing, searching, creating, updating, and deleting students, along with REST APIs for basic CRUD operations.
 
-| MSSV   | Họ và Tên        |
-|--------|------------------|
-| 2312275 | Phan Thành Nghĩa |
+## Tech Stack
 
----
+- Java 21
+- Spring Boot 4
+- Spring MVC
+- Spring Data JPA / Hibernate
+- Thymeleaf
+- PostgreSQL
+- Maven
+- Docker
 
-## 🌐 Public URL (Deploy trên Render)
+## Main Features
 
-👉 [https://student-management-system1-x22d.onrender.com/students](https://student-management-api-r7fc.onrender.com/students)
+- Display the student list
+- Search students by name
+- View student details
+- Add new students
+- Update student information
+- Delete students
+- Manage students through REST APIs
+- Highlight students under 18 years old in the list view
 
----
+## Project Structure
 
-## 🚀 Hướng dẫn chạy dự án (Local)
+```text
+src/main/java/vn/edu/hcmut/cse/adse/lab
++-- controller
+|   +-- DashboardController.java
+|   +-- StudentController.java
+|   +-- StudentWebController.java
++-- entity
+|   +-- Student.java
++-- repository
+|   +-- StudentRepository.java
++-- service
+    +-- StudentService.java
 
-### Bước 1: Clone project
-
-```bash
-git clone https://github.com/nghiaphancs/student-management-system
-cd student-management-system
+src/main/resources
++-- application.properties
++-- templates
+    +-- student-detail.html
+    +-- student-form.html
+    +-- students.html
 ```
 
-### Bước 2: Chạy bằng Docker
+## Database Configuration
+
+The application uses PostgreSQL. Configure the database connection in `src/main/resources/application.properties`:
+
+```properties
+spring.datasource.url=${DATABASE_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+## Run Locally
+
+### Run with Maven
 
 ```bash
-docker desktop start
+./mvnw spring-boot:run
+```
+
+On Windows:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+After the application starts, open:
+
+```text
+http://localhost:8080/students
+```
+
+### Run with Docker
+
+```bash
 docker build -t student-management .
 docker run -p 8080:8080 student-management
 ```
 
-### Bước 3: Truy cập vào ứng dụng
+Then open:
 
-http://localhost:8080
-
----
-
-## 📚 Câu trả lời bài tập
-
-### Lab 1:
-
-- Câu 1:
-
-```sql
-INSERT INTO students (id, name, email, age)
-VALUES
-(1, 'Nguyen Van A', 'vana@example.com', 20),
-(2, 'Tran Thi B', 'thib@example.com', 21),
-(3, 'Le Van C', 'vanc@example.com', 22),
-(4, 'Pham Thi D', 'thid@example.com', 19),
-(5, 'Hoang Van E', 'vane@example.com', 23),
-(6, 'Vu Thi F', 'thif@example.com', 20),
-(7, 'Dang Van G', 'vang@example.com', 21),
-(8, 'Bui Thi H', 'thih@example.com', 22),
-(9, 'Do Van I', 'vani@example.com', 24),
-(10, 'Ngo Thi K', 'thik@example.com', 18);
+```text
+http://localhost:8080/students
 ```
 
-- Câu 2:
+## REST API
 
-Nếu insert sinh viên có id trùng:
+| Method | Endpoint             | Description              |
+|--------|----------------------|--------------------------|
+| GET    | `/api/students`      | Get all students         |
+| GET    | `/api/students/{id}` | Get a student by ID      |
+| POST   | `/api/students`      | Create a new student     |
+| PUT    | `/api/students/{id}` | Update a student         |
+| DELETE | `/api/students/{id}` | Delete a student         |
 
-```sql
-INSERT INTO students (id, name, email, age)
-VALUES (1, 'Test Student', 'test@example.com', 20);
-```
+Example request body for creating a student:
 
-Database báo lỗi:
-
-```terminal
-UNIQUE constraint failed
-```
-
-Cột id là Primary Key nên phải duy nhất.
-Database chặn thao tác này để đảm bảo tính toàn vẹn dữ liệu.
-
-- Câu 3:
-
-Nếu insert sinh viên nhưng để name = NULL:
-
-```sql
-INSERT INTO students (id, email, age)
-VALUES (21, 'noname@example.com', 20);
-```
-
-Database có thể không báo lỗi nếu không có ràng buộc NOT NULL. Ảnh hưởng trong Java:
-
-```java
-student.getName().length();
-```
-
-➡️ Nếu name = NULL → gây:
-
-```terminal
-NullPointerException
-```
-
-➡️ Nên đặt:
-
-```sql
-name TEXT NOT NULL
-```
-
-➡️ Hoặc trong Java:
-
-```java
-@NotNull
-private String name;
-```
-
-- Câu 4:
-
-Nếu mỗi lần restart ứng dụng mà dữ liệu bị mất, nguyên nhân thường là do:
-
-```properties
-spring.jpa.hibernate.ddl-auto=create
-```
-
-Hibernate sẽ xoá bảng cũ và tạo lại khi khởi động.
-
-➡️Cách khắc phục:
-
-```properties
-spring.jpa.hibernate.ddl-auto=update
-```
-
-Chế độ này sẽ: Tạo bảng nếu chưa tồn tại, không xoá dữ liệu cũ
-
-### Lab 3:
-
-- 7.1 Chức năng Tìm Kiếm:
-
-🔹Form tìm kiếm
-
-```html
-<form action="/students" method="GET">
-    <input type="text" name="keyword" placeholder="Nhập tên..." />
-    <button type="submit">Tìm</button>
-</form>
-```
-🔹 Controller
-
-Controller được cập nhật để nhận tham số keyword:
-
-```java
-@GetMapping
-public String getAllStudents(@RequestParam(required = false) String keyword, Model model) {
-    List<Student> students;
-
-    if (keyword != null && !keyword.isEmpty()) {
-        students = service.searchByName(keyword);
-    } else {
-        students = service.getAll();
-    }
-
-    model.addAttribute("dsSinhVien", students);
-    return "students";
+```json
+{
+  "id": "2312001",
+  "name": "Nguyen Van A",
+  "email": "vana@example.com",
+  "age": 20
 }
 ```
 
-🔹 Service
+## Screenshots
 
-Thêm phương thức tìm kiếm:
+### Student List
 
-```java
-public List<Student> searchByName(String keyword) {
-    return repository.findByNameContainingIgnoreCase(keyword);
-}
-```
-🔹 Repository
-
-Spring Data JPA hỗ trợ truy vấn động:
-
-```java
-List<Student> findByNameContainingIgnoreCase(String keyword);
-```
-
-- 7.2 Hiển Thị Có Điều Kiện:
-
-Hệ thống được cải tiến để làm nổi bật các sinh viên chưa đủ 18 tuổi.
-
-Sử dụng Thymeleaf:
-
-```html
-<tr th:each="student : ${dsSinhVien}"
-    th:classappend="${student.age < 18} ? 'text-danger' : ''">
-    <td th:text="${student.id}"></td>
-    <td th:text="${student.name}"></td>
-    <td th:text="${student.email}"></td>
-    <td th:text="${student.age}"></td>
-</tr>
-```
-
-## 🖼️ Screenshot Lab 4
-
-### Trang Danh Sách (List View)
 ![Student List](screenshots/students.png)
 
-### Trang Chi Tiết (Detail View)
+### Student Details
+
 ![Detail View](screenshots/student-detail.png)
 
-### Chức Năng Thêm & Sửa
+### Add and Edit Student
 
 ![Add & Edit](screenshots/add-edit.png)
-
-
